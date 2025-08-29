@@ -5,79 +5,122 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Baby Tracking App</title>
   <style>
+    /* Base Colors */
+    :root {
+      --primary-blue: #055EAA;
+      --accent-green: #4CAF50;
+      --bg-light: #F5F5DC;
+      --text-gray: #6D6E71;
+      --alert-orange: #F57C00;
+      --white: #FFFFFF;
+    }
     body {
-      font-family: Arial, sans-serif;
-      background: #f7f9fc;
       margin: 0;
-      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-gray);
     }
     header {
-      background: #4CAF50;
-      color: white;
-      padding: 1rem;
+      background: var(--primary-blue);
+      color: var(--white);
+      padding: 1.5rem;
       text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    .container {
-      max-width: 900px;
-      margin: auto;
-      padding: 1rem;
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
     }
-    .card {
-      background: white;
-      border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    h2 { color: #333; }
-    input, textarea, select, button {
-      width: 100%;
-      padding: 0.5rem;
-      margin: 0.25rem 0;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    button {
-      background: #4CAF50;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #45a049;
+    header p {
+      margin: 0.2rem 0 0;
+      font-size: 1rem;
     }
     nav {
       display: flex;
-      justify-content: space-around;
-      background: #eee;
-      padding: 0.5rem;
+      justify-content: center;
+      background: var(--white);
+      border-bottom: 1px solid var(--text-gray);
       position: sticky;
       top: 0;
+      z-index: 10;
     }
     nav button {
       flex: 1;
-      margin: 0 0.25rem;
-      background: #4CAF50;
+      padding: 1rem;
+      border: none;
+      background: var(--white);
+      color: var(--primary-blue);
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    nav button:hover,
+    nav button.active {
+      background: var(--accent-green);
+      color: var(--white);
+    }
+    .container {
+      max-width: 800px;
+      margin: 1rem auto;
+      padding: 0 1rem;
+    }
+    .card {
+      background: var(--white);
+      border-radius: 8px;
+      padding: 1.2rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    h2, h3 {
+      color: var(--primary-blue);
+    }
+    input, textarea, select, button {
+      width: 100%;
+      padding: 0.6rem;
+      margin: 0.4rem 0;
+      border-radius: 6px;
+      border: 1px solid var(--text-gray);
+      font-size: 1rem;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--accent-green);
+      outline: none;
+    }
+    button {
+      background: var(--accent-green);
+      color: var(--white);
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #43A047;
     }
     section { display: none; }
     section.active { display: block; }
+    .log-entry {
+      margin: 0.5rem 0;
+      padding: 0.5rem;
+      border-left: 3px solid var(--primary-blue);
+      background: #FAFAFA;
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1>👶 Baby Tracking App</h1>
-    <p>Track growth, routines, milestones & more</p>
+    <h1>Baby Tracking App</h1>
+    <p>Track routines, milestones & more</p>
   </header>
 
-  <!-- Navigation -->
   <nav>
-    <button onclick="showSection('login')">Login</button>
-    <button onclick="showSection('signup')">Sign Up</button>
-    <button onclick="showSection('dashboard')">Dashboard</button>
+    <button onclick="showSection('login')" id="btn-login">Login</button>
+    <button onclick="showSection('signup')" id="btn-signup">Sign Up</button>
+    <button onclick="showSection('dashboard')" id="btn-dashboard">Dashboard</button>
   </nav>
 
   <div class="container">
-    <!-- Login Section -->
+    <!-- Login -->
     <section id="login" class="card active">
       <h2>Login</h2>
       <input type="email" placeholder="Email" id="loginEmail"/>
@@ -85,7 +128,7 @@
       <button onclick="login()">Login</button>
     </section>
 
-    <!-- Signup Section -->
+    <!-- Sign Up -->
     <section id="signup" class="card">
       <h2>Sign Up</h2>
       <input type="text" placeholder="Full Name" id="signupName"/>
@@ -94,20 +137,15 @@
       <button onclick="signup()">Sign Up</button>
     </section>
 
-    <!-- Dashboard Section -->
+    <!-- Dashboard -->
     <section id="dashboard" class="card">
-      <h2>Baby Dashboard</h2>
-      <p>Welcome! Choose a tracker below:</p>
+      <h2>Dashboard</h2>
 
       <!-- Feeding Tracker -->
       <div class="card">
-        <h3>Feeding Tracker</h3>
-        <select id="feedingType">
-          <option>Breast Milk</option>
-          <option>Formula</option>
-          <option>Solids</option>
-        </select>
-        <input type="number" id="feedingAmount" placeholder="Amount (ml/g)" />
+        <h3>Feeding</h3>
+        <select id="feedingType"><option>Breast Milk</option><option>Formula</option><option>Solids</option></select>
+        <input type="number" id="feedingAmount" placeholder="Amount (ml/g)"/>
         <textarea id="feedingNotes" placeholder="Notes"></textarea>
         <button onclick="logFeeding()">Log Feeding</button>
         <div id="feedingLog"></div>
@@ -115,27 +153,23 @@
 
       <!-- Sleep Tracker -->
       <div class="card">
-        <h3>Sleep Tracker</h3>
-        <input type="time" id="sleepStart"/> to
-        <input type="time" id="sleepEnd"/>
+        <h3>Sleep</h3>
+        <input type="time" id="sleepStart"/> to <input type="time" id="sleepEnd"/>
         <button onclick="logSleep()">Log Sleep</button>
         <div id="sleepLog"></div>
       </div>
 
       <!-- Diaper Tracker -->
       <div class="card">
-        <h3>Diaper Tracker</h3>
-        <select id="diaperType">
-          <option>Wet</option>
-          <option>Dirty</option>
-        </select>
+        <h3>Diaper</h3>
+        <select id="diaperType"><option>Wet</option><option>Dirty</option></select>
         <button onclick="logDiaper()">Log Diaper</button>
         <div id="diaperLog"></div>
       </div>
 
       <!-- Growth Tracker -->
       <div class="card">
-        <h3>Growth Tracker</h3>
+        <h3>Growth</h3>
         <input type="number" id="weight" placeholder="Weight (kg)"/>
         <input type="number" id="height" placeholder="Height (cm)"/>
         <input type="number" id="headSize" placeholder="Head Circumference (cm)"/>
@@ -145,85 +179,58 @@
 
       <!-- Milestones -->
       <div class="card">
-        <h3>Milestone Tracker</h3>
+        <h3>Milestone</h3>
         <input type="text" id="milestone" placeholder="Milestone (e.g. First word)"/>
         <button onclick="logMilestone()">Log Milestone</button>
         <div id="milestoneLog"></div>
       </div>
 
-      <!-- Baby Journal -->
+      <!-- Journal -->
       <div class="card">
-        <h3>Baby Journal</h3>
+        <h3>Journal & Photos</h3>
         <textarea id="journalEntry" placeholder="Write a note"></textarea>
         <input type="file" id="journalPhoto"/>
         <button onclick="logJournal()">Add to Journal</button>
         <div id="journalLog"></div>
-      </div>
-
-      <!-- Extras -->
-      <div class="card">
-        <h3>Extras</h3>
-        <ul>
-          <li>🕑 Reminders for vaccines & appointments</li>
-          <li>🤖 AI Sleep Guidance (future feature)</li>
-          <li>👨‍👩‍👧 Family Sharing & Sync</li>
-          <li>📚 Educational Resources</li>
-          <li>🎵 White Noise Generator</li>
-          <li>📊 Growth Charts (Premature adjustment)</li>
-          <li>📤 Data Export to PDF</li>
-          <li>⌚ Smartwatch Integration</li>
-        </ul>
       </div>
     </section>
   </div>
 
   <script>
     function showSection(id) {
-      document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
-      document.getElementById(id).classList.add("active");
+      document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+      document.getElementById('btn-' + id).classList.add('active');
+      document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
     }
+    function signup(){ alert('Signup successful!'); showSection('login'); }
+    function login(){ alert('Login successful!'); showSection('dashboard'); }
 
-    // Basic Auth Simulation
-    function signup() {
-      alert("Signup successful! Now login.");
-      showSection('login');
+    function makeLog(el, text) {
+      const div = document.createElement('div');
+      div.className = 'log-entry';
+      div.textContent = text;
+      el.appendChild(div);
     }
-    function login() {
-      alert("Login successful!");
-      showSection('dashboard');
-    }
-
-    // Logs
     function logFeeding() {
-      const type = document.getElementById("feedingType").value;
-      const amount = document.getElementById("feedingAmount").value;
-      const notes = document.getElementById("feedingNotes").value;
-      document.getElementById("feedingLog").innerHTML += `<p>🍼 ${type} - ${amount}ml/g (${notes})</p>`;
+      const type = feedingType.value, amt = feedingAmount.value, note = feedingNotes.value;
+      makeLog(feedingLog, `🍼 ${type} • ${amt} ml/g${note ? ' • '+note : ''}`);
     }
     function logSleep() {
-      const start = document.getElementById("sleepStart").value;
-      const end = document.getElementById("sleepEnd").value;
-      document.getElementById("sleepLog").innerHTML += `<p>😴 Slept from ${start} to ${end}</p>`;
+      makeLog(sleepLog, `😴 From ${sleepStart.value} to ${sleepEnd.value}`);
     }
     function logDiaper() {
-      const type = document.getElementById("diaperType").value;
-      document.getElementById("diaperLog").innerHTML += `<p>🧷 Diaper: ${type}</p>`;
+      makeLog(diaperLog, `🧷 ${diaperType.value}`);
     }
     function logGrowth() {
-      const w = document.getElementById("weight").value;
-      const h = document.getElementById("height").value;
-      const head = document.getElementById("headSize").value;
-      document.getElementById("growthLog").innerHTML += `<p>📈 W:${w}kg, H:${h}cm, Head:${head}cm</p>`;
+      makeLog(growthLog, `📈 W: ${weight.value} kg, H: ${height.value} cm, Head: ${headSize.value} cm`);
     }
     function logMilestone() {
-      const m = document.getElementById("milestone").value;
-      document.getElementById("milestoneLog").innerHTML += `<p>🌟 ${m}</p>`;
+      makeLog(milestoneLog, `🌟 ${milestone.value}`);
     }
     function logJournal() {
-      const entry = document.getElementById("journalEntry").value;
-      const photo = document.getElementById("journalPhoto").files[0];
-      let photoText = photo ? ` with photo (${photo.name})` : "";
-      document.getElementById("journalLog").innerHTML += `<p>📔 ${entry}${photoText}</p>`;
+      const entry = journalEntry.value, photo = journalPhoto.files[0];
+      makeLog(journalLog, `📔 ${entry}${photo ? ' (Photo: '+photo.name+')' : ''}`);
     }
   </script>
 </body>
