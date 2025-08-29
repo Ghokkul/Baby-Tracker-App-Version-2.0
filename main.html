@@ -77,12 +77,16 @@
       border-left: 3px solid var(--primary-blue);
       background: #FAFAFA;
     }
+    .reminder-due {
+      background: #FFF3E0;
+      border-left: 3px solid var(--alert-orange);
+    }
   </style>
 </head>
 <body>
   <header>
     <h1>Baby Tracking App</h1>
-    <p>Track routines, milestones & more</p>
+    <p>Track routines, milestones, health & more</p>
   </header>
 
   <nav>
@@ -167,11 +171,31 @@
         <button onclick="logJournal()">Add to Journal</button>
         <div id="journalLog"></div>
       </div>
+
+      <!-- Health & Vaccinations -->
+      <div class="card">
+        <h3>Health & Vaccinations</h3>
+
+        <!-- Vaccination -->
+        <h4>Immunizations / Medication</h4>
+        <input type="text" id="vaccineName" placeholder="Name (e.g. Polio, Vitamin D)"/>
+        <input type="date" id="vaccineDate"/>
+        <textarea id="vaccineNotes" placeholder="Notes (e.g. dosage, reaction)"></textarea>
+        <button onclick="logVaccine()">Log Record</button>
+        <div id="vaccineLog"></div>
+
+        <!-- Reminders -->
+        <h4>Doctor Visit Reminders</h4>
+        <input type="date" id="reminderDate"/>
+        <textarea id="reminderNotes" placeholder="Reminder note (e.g. 6-month checkup)"></textarea>
+        <button onclick="addReminder()">Add Reminder</button>
+        <div id="reminderLog"></div>
+      </div>
     </section>
   </div>
 
   <script>
-    // Show/Hide sections
+    // Section control
     function showSection(id) {
       document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
       if(document.getElementById('btn-' + id)) {
@@ -181,7 +205,7 @@
       document.getElementById(id).classList.add('active');
     }
 
-    // Signup and save user
+    // Auth system
     function signup() {
       const name = signupName.value.trim();
       const email = signupEmail.value.trim();
@@ -194,8 +218,6 @@
         alert("Please fill all fields.");
       }
     }
-
-    // Login and remember user
     function login() {
       const email = loginEmail.value.trim();
       const pass = loginPassword.value.trim();
@@ -205,19 +227,16 @@
         document.getElementById("userName").textContent = user.name;
         document.getElementById("btn-logout").style.display = "block";
         showSection('dashboard');
+        loadHealthData();
       } else {
         alert("Invalid credentials!");
       }
     }
-
-    // Logout
     function logout() {
       localStorage.setItem("babyAppLoggedIn", "false");
       showSection('login');
       document.getElementById("btn-logout").style.display = "none";
     }
-
-    // Auto-login check
     window.onload = () => {
       const user = JSON.parse(localStorage.getItem("babyAppUser"));
       const loggedIn = localStorage.getItem("babyAppLoggedIn");
@@ -225,18 +244,21 @@
         document.getElementById("userName").textContent = user.name;
         document.getElementById("btn-logout").style.display = "block";
         showSection('dashboard');
+        loadHealthData();
       } else {
         showSection('login');
       }
     };
 
-    // Log entry helper
-    function makeLog(el, text) {
+    // Generic log helper
+    function makeLog(el, text, extraClass="") {
       const div = document.createElement('div');
-      div.className = 'log-entry';
+      div.className = 'log-entry ' + extraClass;
       div.textContent = text;
       el.appendChild(div);
     }
+
+    // Trackers
     function logFeeding() {
       makeLog(feedingLog, `🍼 ${feedingType.value} • ${feedingAmount.value} ml/g • ${feedingNotes.value}`);
     }
@@ -248,6 +270,44 @@
       let text = journalEntry.value;
       if(journalPhoto.files[0]) text += ` (Photo: ${journalPhoto.files[0].name})`;
       makeLog(journalLog, `📔 ${text}`);
+    }
+
+    // Health & Vaccinations
+    function logVaccine() {
+      const name = vaccineName.value, date = vaccineDate.value, notes = vaccineNotes.value;
+      const record = {name, date, notes};
+      let list = JSON.parse(localStorage.getItem("babyVaccines")) || [];
+      list.push(record);
+      localStorage.setItem("babyVaccines", JSON.stringify(list));
+      renderVaccines();
+    }
+    function addReminder() {
+      const date = reminderDate.value, notes = reminderNotes.value;
+      const record = {date, notes};
+      let list = JSON.parse(localStorage.getItem("babyReminders")) || [];
+      list.push(record);
+      localStorage.setItem("babyReminders", JSON.stringify(list));
+      renderReminders();
+    }
+    function renderVaccines() {
+      vaccineLog.innerHTML = "";
+      const list = JSON.parse(localStorage.getItem("babyVaccines")) || [];
+      list.forEach(v => {
+        makeLog(vaccineLog, `💉 ${v.name} on ${v.date} (${v.notes})`);
+      });
+    }
+    function renderReminders() {
+      reminderLog.innerHTML = "";
+      const today = new Date().toISOString().split("T")[0];
+      const list = JSON.parse(localStorage.getItem("babyReminders")) || [];
+      list.forEach(r => {
+        const isDue = r.date && r.date <= today;
+        makeLog(reminderLog, `📅 ${r.date} • ${r.notes}`, isDue ? "reminder-due" : "");
+      });
+    }
+    function loadHealthData() {
+      renderVaccines();
+      renderReminders();
     }
   </script>
 </body>
