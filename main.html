@@ -1,117 +1,230 @@
-<script>
-  if(!localStorage.getItem("loggedInUser")) {
-    alert("Please login first!");
-    window.location.href = "login.html";
-  }
-</script>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Baby Tracker</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Baby Tracking App</title>
   <style>
     body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: #f4f7f9;
+      font-family: Arial, sans-serif;
+      background: #f7f9fc;
       margin: 0;
       padding: 0;
     }
     header {
       background: #4CAF50;
       color: white;
-      padding: 15px;
+      padding: 1rem;
       text-align: center;
-      position: relative;
     }
-    header button {
-      position: absolute;
-      right: 15px;
-      top: 15px;
-      background: #d9534f;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 5px;
-      color: white;
-      cursor: pointer;
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 1rem;
     }
-    h1 {
-      margin: 0;
-    }
-    .section {
+    .card {
       background: white;
-      padding: 20px;
-      margin: 20px auto;
-      border-radius: 12px;
-      box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
-      max-width: 600px;
-    }
-    h2 {
-      color: #4CAF50;
-      margin-bottom: 10px;
-    }
-    label {
-      display: block;
-      margin-top: 12px;
-      font-weight: bold;
-    }
-    input, select, textarea, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
       border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    h2 { color: #333; }
+    input, textarea, select, button {
+      width: 100%;
+      padding: 0.5rem;
+      margin: 0.25rem 0;
+      border-radius: 5px;
       border: 1px solid #ccc;
-      font-size: 14px;
     }
     button {
       background: #4CAF50;
       color: white;
       border: none;
-      margin-top: 12px;
-      font-weight: bold;
-      transition: 0.3s;
+      cursor: pointer;
     }
     button:hover {
       background: #45a049;
     }
-    .log {
-      margin-top: 12px;
-      background: #f9f9f9;
-      padding: 12px;
-      border-radius: 8px;
-      max-height: 150px;
-      overflow-y: auto;
-      font-size: 14px;
+    nav {
+      display: flex;
+      justify-content: space-around;
+      background: #eee;
+      padding: 0.5rem;
+      position: sticky;
+      top: 0;
     }
-    canvas {
-      margin-top: 15px;
-      background: #fdfdfd;
-      border-radius: 8px;
-      padding: 10px;
+    nav button {
+      flex: 1;
+      margin: 0 0.25rem;
+      background: #4CAF50;
     }
+    section { display: none; }
+    section.active { display: block; }
   </style>
 </head>
 <body>
-  <script>
-    if(!localStorage.getItem("loggedInUser")) {
-      alert("Please login first!");
-      window.location.href = "login.html";
-    }
-  </script>
-
   <header>
-    <h1>👶 Baby Tracker</h1>
-    <button onclick="logout()">Logout</button>
+    <h1>👶 Baby Tracking App</h1>
+    <p>Track growth, routines, milestones & more</p>
   </header>
 
-  <p style="text-align:center; margin:20px;">Track feeding, sleep, diapers, growth, vaccines & milestones!</p>
+  <!-- Navigation -->
+  <nav>
+    <button onclick="showSection('login')">Login</button>
+    <button onclick="showSection('signup')">Sign Up</button>
+    <button onclick="showSection('dashboard')">Dashboard</button>
+  </nav>
 
-  <!-- Sections (same as before, just styled nicely) -->
-  <!-- ... (keep the same HTML & JS logic from previous main.html, no changes needed except styles) ... -->
+  <div class="container">
+    <!-- Login Section -->
+    <section id="login" class="card active">
+      <h2>Login</h2>
+      <input type="email" placeholder="Email" id="loginEmail"/>
+      <input type="password" placeholder="Password" id="loginPassword"/>
+      <button onclick="login()">Login</button>
+    </section>
 
-  <!-- Insert same script with all functions from before -->
-  <!-- (Profile, Feeding, Sleep, Diaper, Growth, Vaccination, Milestones, Summary, Chart.js) -->
+    <!-- Signup Section -->
+    <section id="signup" class="card">
+      <h2>Sign Up</h2>
+      <input type="text" placeholder="Full Name" id="signupName"/>
+      <input type="email" placeholder="Email" id="signupEmail"/>
+      <input type="password" placeholder="Password" id="signupPassword"/>
+      <button onclick="signup()">Sign Up</button>
+    </section>
 
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="card">
+      <h2>Baby Dashboard</h2>
+      <p>Welcome! Choose a tracker below:</p>
+
+      <!-- Feeding Tracker -->
+      <div class="card">
+        <h3>Feeding Tracker</h3>
+        <select id="feedingType">
+          <option>Breast Milk</option>
+          <option>Formula</option>
+          <option>Solids</option>
+        </select>
+        <input type="number" id="feedingAmount" placeholder="Amount (ml/g)" />
+        <textarea id="feedingNotes" placeholder="Notes"></textarea>
+        <button onclick="logFeeding()">Log Feeding</button>
+        <div id="feedingLog"></div>
+      </div>
+
+      <!-- Sleep Tracker -->
+      <div class="card">
+        <h3>Sleep Tracker</h3>
+        <input type="time" id="sleepStart"/> to
+        <input type="time" id="sleepEnd"/>
+        <button onclick="logSleep()">Log Sleep</button>
+        <div id="sleepLog"></div>
+      </div>
+
+      <!-- Diaper Tracker -->
+      <div class="card">
+        <h3>Diaper Tracker</h3>
+        <select id="diaperType">
+          <option>Wet</option>
+          <option>Dirty</option>
+        </select>
+        <button onclick="logDiaper()">Log Diaper</button>
+        <div id="diaperLog"></div>
+      </div>
+
+      <!-- Growth Tracker -->
+      <div class="card">
+        <h3>Growth Tracker</h3>
+        <input type="number" id="weight" placeholder="Weight (kg)"/>
+        <input type="number" id="height" placeholder="Height (cm)"/>
+        <input type="number" id="headSize" placeholder="Head Circumference (cm)"/>
+        <button onclick="logGrowth()">Log Growth</button>
+        <div id="growthLog"></div>
+      </div>
+
+      <!-- Milestones -->
+      <div class="card">
+        <h3>Milestone Tracker</h3>
+        <input type="text" id="milestone" placeholder="Milestone (e.g. First word)"/>
+        <button onclick="logMilestone()">Log Milestone</button>
+        <div id="milestoneLog"></div>
+      </div>
+
+      <!-- Baby Journal -->
+      <div class="card">
+        <h3>Baby Journal</h3>
+        <textarea id="journalEntry" placeholder="Write a note"></textarea>
+        <input type="file" id="journalPhoto"/>
+        <button onclick="logJournal()">Add to Journal</button>
+        <div id="journalLog"></div>
+      </div>
+
+      <!-- Extras -->
+      <div class="card">
+        <h3>Extras</h3>
+        <ul>
+          <li>🕑 Reminders for vaccines & appointments</li>
+          <li>🤖 AI Sleep Guidance (future feature)</li>
+          <li>👨‍👩‍👧 Family Sharing & Sync</li>
+          <li>📚 Educational Resources</li>
+          <li>🎵 White Noise Generator</li>
+          <li>📊 Growth Charts (Premature adjustment)</li>
+          <li>📤 Data Export to PDF</li>
+          <li>⌚ Smartwatch Integration</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    function showSection(id) {
+      document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+    }
+
+    // Basic Auth Simulation
+    function signup() {
+      alert("Signup successful! Now login.");
+      showSection('login');
+    }
+    function login() {
+      alert("Login successful!");
+      showSection('dashboard');
+    }
+
+    // Logs
+    function logFeeding() {
+      const type = document.getElementById("feedingType").value;
+      const amount = document.getElementById("feedingAmount").value;
+      const notes = document.getElementById("feedingNotes").value;
+      document.getElementById("feedingLog").innerHTML += `<p>🍼 ${type} - ${amount}ml/g (${notes})</p>`;
+    }
+    function logSleep() {
+      const start = document.getElementById("sleepStart").value;
+      const end = document.getElementById("sleepEnd").value;
+      document.getElementById("sleepLog").innerHTML += `<p>😴 Slept from ${start} to ${end}</p>`;
+    }
+    function logDiaper() {
+      const type = document.getElementById("diaperType").value;
+      document.getElementById("diaperLog").innerHTML += `<p>🧷 Diaper: ${type}</p>`;
+    }
+    function logGrowth() {
+      const w = document.getElementById("weight").value;
+      const h = document.getElementById("height").value;
+      const head = document.getElementById("headSize").value;
+      document.getElementById("growthLog").innerHTML += `<p>📈 W:${w}kg, H:${h}cm, Head:${head}cm</p>`;
+    }
+    function logMilestone() {
+      const m = document.getElementById("milestone").value;
+      document.getElementById("milestoneLog").innerHTML += `<p>🌟 ${m}</p>`;
+    }
+    function logJournal() {
+      const entry = document.getElementById("journalEntry").value;
+      const photo = document.getElementById("journalPhoto").files[0];
+      let photoText = photo ? ` with photo (${photo.name})` : "";
+      document.getElementById("journalLog").innerHTML += `<p>📔 ${entry}${photoText}</p>`;
+    }
+  </script>
 </body>
 </html>
