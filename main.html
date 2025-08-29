@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Baby Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      padding: 20px;
+      color: #333;
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    .section {
+      background: #fff;
+      padding: 15px;
+      margin: 15px auto;
+      border-radius: 10px;
+      box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+      max-width: 500px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    .log {
+      margin-top: 10px;
+      background: #f1f1f1;
+      padding: 10px;
+      border-radius: 5px;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>👶 Baby Tracker</h1>
+  <p style="text-align:center;">Track feeding, sleep, diaper changes, and growth milestones!</p>
+
+  <!-- Feeding Tracker -->
+  <div class="section">
+    <h2>Feeding</h2>
+    <label for="feed-type">Type:</label>
+    <select id="feed-type">
+      <option>Breast Milk</option>
+      <option>Formula</option>
+      <option>Solid Food</option>
+    </select>
+    <label for="feed-amount">Amount (ml or oz):</label>
+    <input type="number" id="feed-amount">
+    <button onclick="logFeeding()">Log Feeding</button>
+    <div id="feed-log" class="log"></div>
+  </div>
+
+  <!-- Sleep Tracker -->
+  <div class="section">
+    <h2>Sleep</h2>
+    <label for="sleep-start">Start Time:</label>
+    <input type="time" id="sleep-start">
+    <label for="sleep-end">End Time:</label>
+    <input type="time" id="sleep-end">
+    <button onclick="logSleep()">Log Sleep</button>
+    <div id="sleep-log" class="log"></div>
+  </div>
+
+  <!-- Diaper Tracker -->
+  <div class="section">
+    <h2>Diaper Change</h2>
+    <label for="diaper-type">Type:</label>
+    <select id="diaper-type">
+      <option>Wet</option>
+      <option>Dirty</option>
+      <option>Mixed</option>
+    </select>
+    <button onclick="logDiaper()">Log Diaper Change</button>
+    <div id="diaper-log" class="log"></div>
+  </div>
+
+  <!-- Growth Tracker -->
+  <div class="section">
+    <h2>Growth</h2>
+    <label for="weight">Weight (kg):</label>
+    <input type="number" id="weight" step="0.1">
+    <label for="height">Height (cm):</label>
+    <input type="number" id="height">
+    <button onclick="logGrowth()">Log Growth</button>
+    <div id="growth-log" class="log"></div>
+  </div>
+
+  <!-- Notes / Milestones -->
+  <div class="section">
+    <h2>Milestones & Notes</h2>
+    <textarea id="milestone" rows="3" placeholder="Baby's first smile, rolling over..."></textarea>
+    <button onclick="logMilestone()">Save Note</button>
+    <div id="milestone-log" class="log"></div>
+  </div>
+
+  <script>
+    function addLog(logId, message) {
+      const log = document.getElementById(logId);
+      const time = new Date().toLocaleString();
+      log.innerHTML += `<p>📌 ${message} <br><small>${time}</small></p>`;
+    }
+
+    function logFeeding() {
+      const type = document.getElementById('feed-type').value;
+      const amount = document.getElementById('feed-amount').value;
+      if(amount) {
+        addLog('feed-log', `Feeding: ${type} - ${amount} ml/oz`);
+        document.getElementById('feed-amount').value = "";
+      }
+    }
+
+    function logSleep() {
+      const start = document.getElementById('sleep-start').value;
+      const end = document.getElementById('sleep-end').value;
+      if(start && end) {
+        addLog('sleep-log', `Sleep from ${start} to ${end}`);
+        document.getElementById('sleep-start').value = "";
+        document.getElementById('sleep-end').value = "";
+      }
+    }
+
+    function logDiaper() {
+      const type = document.getElementById('diaper-type').value;
+      addLog('diaper-log', `Diaper change: ${type}`);
+    }
+
+    function logGrowth() {
+      const weight = document.getElementById('weight').value;
+      const height = document.getElementById('height').value;
+      if(weight || height) {
+        addLog('growth-log', `Growth update - Weight: ${weight}kg, Height: ${height}cm`);
+        document.getElementById('weight').value = "";
+        document.getElementById('height').value = "";
+      }
+    }
+
+    function logMilestone() {
+      const note = document.getElementById('milestone').value;
+      if(note.trim() !== "") {
+        addLog('milestone-log', `Milestone: ${note}`);
+        document.getElementById('milestone').value = "";
+      }
+    }
+  </script>
+</body>
+</html>
