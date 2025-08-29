@@ -13,7 +13,6 @@
   }
 </script>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,7 +35,7 @@
       margin: 15px auto;
       border-radius: 10px;
       box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
-      max-width: 500px;
+      max-width: 600px;
     }
     label {
       display: block;
@@ -66,117 +65,258 @@
       max-height: 150px;
       overflow-y: auto;
     }
+    .logout {
+      float: right; 
+      margin: 10px; 
+      background: #d9534f;
+      border: none;
+    }
   </style>
 </head>
 <body>
-  <h1>👶 Baby Tracker</h1>
-  <p style="text-align:center;">Track feeding, sleep, diaper changes, and growth milestones!</p>
+  <script>
+    // Only allow logged in users
+    if(!localStorage.getItem("loggedInUser")) {
+      alert("Please login first!");
+      window.location.href = "login.html";
+    }
+  </script>
 
-  <!-- Feeding Tracker -->
+  <button class="logout" onclick="logout()">Logout</button>
+  <h1>👶 Baby Tracker</h1>
+  <p style="text-align:center;">Track feeding, sleep, diapers, growth, vaccines & more!</p>
+
+  <!-- Baby Profile -->
+  <div class="section">
+    <h2>Baby Profile</h2>
+    <label>Name:</label>
+    <input type="text" id="baby-name">
+    <label>Date of Birth:</label>
+    <input type="date" id="baby-dob">
+    <label>Gender:</label>
+    <select id="baby-gender">
+      <option>Male</option>
+      <option>Female</option>
+    </select>
+    <label>Blood Type:</label>
+    <select id="baby-blood">
+      <option>A</option>
+      <option>B</option>
+      <option>AB</option>
+      <option>O</option>
+    </select>
+    <button onclick="saveProfile()">Save Profile</button>
+    <div id="profile-log" class="log"></div>
+  </div>
+
+  <!-- Feeding -->
   <div class="section">
     <h2>Feeding</h2>
-    <label for="feed-type">Type:</label>
+    <label>Type:</label>
     <select id="feed-type">
       <option>Breast Milk</option>
       <option>Formula</option>
       <option>Solid Food</option>
     </select>
-    <label for="feed-amount">Amount (ml or oz):</label>
+    <label>Amount (ml/oz):</label>
     <input type="number" id="feed-amount">
     <button onclick="logFeeding()">Log Feeding</button>
     <div id="feed-log" class="log"></div>
   </div>
 
-  <!-- Sleep Tracker -->
+  <!-- Sleep -->
   <div class="section">
     <h2>Sleep</h2>
-    <label for="sleep-start">Start Time:</label>
+    <label>Start:</label>
     <input type="time" id="sleep-start">
-    <label for="sleep-end">End Time:</label>
+    <label>End:</label>
     <input type="time" id="sleep-end">
     <button onclick="logSleep()">Log Sleep</button>
     <div id="sleep-log" class="log"></div>
   </div>
 
-  <!-- Diaper Tracker -->
+  <!-- Diaper -->
   <div class="section">
     <h2>Diaper Change</h2>
-    <label for="diaper-type">Type:</label>
+    <label>Type:</label>
     <select id="diaper-type">
       <option>Wet</option>
       <option>Dirty</option>
       <option>Mixed</option>
     </select>
-    <button onclick="logDiaper()">Log Diaper Change</button>
+    <button onclick="logDiaper()">Log Diaper</button>
     <div id="diaper-log" class="log"></div>
   </div>
 
-  <!-- Growth Tracker -->
+  <!-- Growth -->
   <div class="section">
     <h2>Growth</h2>
-    <label for="weight">Weight (kg):</label>
+    <label>Weight (kg):</label>
     <input type="number" id="weight" step="0.1">
-    <label for="height">Height (cm):</label>
+    <label>Height (cm):</label>
     <input type="number" id="height">
     <button onclick="logGrowth()">Log Growth</button>
+    <canvas id="growthChart" width="400" height="200"></canvas>
     <div id="growth-log" class="log"></div>
   </div>
 
-  <!-- Notes / Milestones -->
+  <!-- Vaccination -->
   <div class="section">
-    <h2>Milestones & Notes</h2>
-    <textarea id="milestone" rows="3" placeholder="Baby's first smile, rolling over..."></textarea>
-    <button onclick="logMilestone()">Save Note</button>
+    <h2>Vaccination Tracker</h2>
+    <select id="vaccine">
+      <option>Polio</option>
+      <option>Hepatitis B</option>
+      <option>MMR</option>
+      <option>DTaP</option>
+      <option>Flu Shot</option>
+    </select>
+    <button onclick="logVaccine()">Mark Completed</button>
+    <div id="vaccine-log" class="log"></div>
+  </div>
+
+  <!-- Milestones -->
+  <div class="section">
+    <h2>Milestones</h2>
+    <textarea id="milestone" rows="3" placeholder="Baby’s first smile..."></textarea>
+    <button onclick="logMilestone()">Save Milestone</button>
     <div id="milestone-log" class="log"></div>
   </div>
 
+  <!-- Daily Summary -->
+  <div class="section">
+    <h2>Daily Summary</h2>
+    <button onclick="showSummary()">Show Summary</button>
+    <div id="summary-log" class="log"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
+    const user = localStorage.getItem("loggedInUser");
+
+    function logout() {
+      localStorage.removeItem("loggedInUser");
+      window.location.href = "login.html";
+    }
+
     function addLog(logId, message) {
       const log = document.getElementById(logId);
       const time = new Date().toLocaleString();
       log.innerHTML += `<p>📌 ${message} <br><small>${time}</small></p>`;
     }
 
+    // Profile
+    function saveProfile() {
+      const profile = {
+        name: document.getElementById('baby-name').value,
+        dob: document.getElementById('baby-dob').value,
+        gender: document.getElementById('baby-gender').value,
+        blood: document.getElementById('baby-blood').value
+      };
+      localStorage.setItem(user + "_profile", JSON.stringify(profile));
+      addLog('profile-log', `Profile Saved for ${profile.name}`);
+    }
+
+    // Feeding
     function logFeeding() {
       const type = document.getElementById('feed-type').value;
       const amount = document.getElementById('feed-amount').value;
       if(amount) {
         addLog('feed-log', `Feeding: ${type} - ${amount} ml/oz`);
         document.getElementById('feed-amount').value = "";
+        incrementCounter("feedCount");
       }
     }
 
+    // Sleep
     function logSleep() {
       const start = document.getElementById('sleep-start').value;
       const end = document.getElementById('sleep-end').value;
       if(start && end) {
         addLog('sleep-log', `Sleep from ${start} to ${end}`);
+        incrementCounter("sleepCount");
         document.getElementById('sleep-start').value = "";
         document.getElementById('sleep-end').value = "";
       }
     }
 
+    // Diaper
     function logDiaper() {
       const type = document.getElementById('diaper-type').value;
-      addLog('diaper-log', `Diaper change: ${type}`);
+      addLog('diaper-log', `Diaper: ${type}`);
+      incrementCounter("diaperCount");
     }
 
+    // Growth (with chart)
+    let growthData = JSON.parse(localStorage.getItem(user + "_growth") || "[]");
     function logGrowth() {
       const weight = document.getElementById('weight').value;
       const height = document.getElementById('height').value;
       if(weight || height) {
-        addLog('growth-log', `Growth update - Weight: ${weight}kg, Height: ${height}cm`);
-        document.getElementById('weight').value = "";
-        document.getElementById('height').value = "";
+        addLog('growth-log', `Growth - W:${weight}kg H:${height}cm`);
+        growthData.push({date: new Date().toLocaleDateString(), weight, height});
+        localStorage.setItem(user + "_growth", JSON.stringify(growthData));
+        updateChart();
       }
     }
 
+    // Vaccines
+    function logVaccine() {
+      const v = document.getElementById('vaccine').value;
+      addLog('vaccine-log', `Vaccine Completed: ${v}`);
+    }
+
+    // Milestones
     function logMilestone() {
       const note = document.getElementById('milestone').value;
       if(note.trim() !== "") {
         addLog('milestone-log', `Milestone: ${note}`);
         document.getElementById('milestone').value = "";
       }
+    }
+
+    // Daily Summary
+    function incrementCounter(key) {
+      let count = parseInt(localStorage.getItem(user + "_" + key) || "0");
+      count++;
+      localStorage.setItem(user + "_" + key, count);
+    }
+    function showSummary() {
+      const feed = localStorage.getItem(user + "_feedCount") || 0;
+      const sleep = localStorage.getItem(user + "_sleepCount") || 0;
+      const diaper = localStorage.getItem(user + "_diaperCount") || 0;
+      document.getElementById("summary-log").innerHTML =
+        `<p>🍽️ Feedings: ${feed}</p>
+         <p>😴 Sleeps: ${sleep}</p>
+         <p>🍼 Diapers: ${diaper}</p>`;
+    }
+
+    // Chart.js growth chart
+    let ctx = document.getElementById('growthChart').getContext('2d');
+    let chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: growthData.map(d => d.date),
+        datasets: [
+          {
+            label: 'Weight (kg)',
+            data: growthData.map(d => d.weight),
+            borderColor: 'blue',
+            fill: false
+          },
+          {
+            label: 'Height (cm)',
+            data: growthData.map(d => d.height),
+            borderColor: 'green',
+            fill: false
+          }
+        ]
+      }
+    });
+    function updateChart() {
+      chart.data.labels = growthData.map(d => d.date);
+      chart.data.datasets[0].data = growthData.map(d => d.weight);
+      chart.data.datasets[1].data = growthData.map(d => d.height);
+      chart.update();
     }
   </script>
 </body>
