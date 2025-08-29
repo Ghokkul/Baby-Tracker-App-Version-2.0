@@ -89,11 +89,10 @@
     <p>Track routines, milestones, health & more</p>
   </header>
 
-  <nav>
-    <button onclick="showSection('login')" id="btn-login">Login</button>
-    <button onclick="showSection('signup')" id="btn-signup">Sign Up</button>
+  <nav id="mainNav" style="display:none;">
     <button onclick="showSection('dashboard')" id="btn-dashboard">Dashboard</button>
-    <button onclick="logout()" id="btn-logout" style="display:none;">Logout</button>
+    <button onclick="showSection('newsfeed')" id="btn-newsfeed">News Feed</button>
+    <button onclick="logout()" id="btn-logout">Logout</button>
   </nav>
 
   <div class="container">
@@ -103,6 +102,7 @@
       <input type="email" placeholder="Email" id="loginEmail"/>
       <input type="password" placeholder="Password" id="loginPassword"/>
       <button onclick="login()">Login</button>
+      <p>Don’t have an account? <a href="#" onclick="showSection('signup')">Sign up here</a></p>
     </section>
 
     <!-- Sign Up -->
@@ -112,84 +112,30 @@
       <input type="email" placeholder="Email" id="signupEmail"/>
       <input type="password" placeholder="Password" id="signupPassword"/>
       <button onclick="signup()">Sign Up</button>
+      <p>Already have an account? <a href="#" onclick="showSection('login')">Login</a></p>
     </section>
 
     <!-- Dashboard -->
     <section id="dashboard" class="card">
       <h2>Dashboard</h2>
       <p>Welcome back, <span id="userName"></span>!</p>
+      <p>Here you can access your baby trackers and health logs.</p>
+    </section>
 
-      <!-- Feeding Tracker -->
+    <!-- News Feed -->
+    <section id="newsfeed" class="card">
+      <h2>News Feed</h2>
       <div class="card">
-        <h3>Feeding</h3>
-        <select id="feedingType"><option>Breast Milk</option><option>Formula</option><option>Solids</option></select>
-        <input type="number" id="feedingAmount" placeholder="Amount (ml/g)"/>
-        <textarea id="feedingNotes" placeholder="Notes"></textarea>
-        <button onclick="logFeeding()">Log Feeding</button>
-        <div id="feedingLog"></div>
+        <h3>🍼 Feeding Tips</h3>
+        <p>Introduce solid foods around 6 months, starting with purees.</p>
       </div>
-
-      <!-- Sleep Tracker -->
       <div class="card">
-        <h3>Sleep</h3>
-        <input type="time" id="sleepStart"/> to <input type="time" id="sleepEnd"/>
-        <button onclick="logSleep()">Log Sleep</button>
-        <div id="sleepLog"></div>
+        <h3>💉 Health Update</h3>
+        <p>Don’t forget the 6-month vaccinations: DTaP, Polio, Hib, and more.</p>
       </div>
-
-      <!-- Diaper Tracker -->
       <div class="card">
-        <h3>Diaper</h3>
-        <select id="diaperType"><option>Wet</option><option>Dirty</option></select>
-        <button onclick="logDiaper()">Log Diaper</button>
-        <div id="diaperLog"></div>
-      </div>
-
-      <!-- Growth Tracker -->
-      <div class="card">
-        <h3>Growth</h3>
-        <input type="number" id="weight" placeholder="Weight (kg)"/>
-        <input type="number" id="height" placeholder="Height (cm)"/>
-        <input type="number" id="headSize" placeholder="Head Circumference (cm)"/>
-        <button onclick="logGrowth()">Log Growth</button>
-        <div id="growthLog"></div>
-      </div>
-
-      <!-- Milestones -->
-      <div class="card">
-        <h3>Milestone</h3>
-        <input type="text" id="milestone" placeholder="Milestone (e.g. First word)"/>
-        <button onclick="logMilestone()">Log Milestone</button>
-        <div id="milestoneLog"></div>
-      </div>
-
-      <!-- Journal -->
-      <div class="card">
-        <h3>Journal & Photos</h3>
-        <textarea id="journalEntry" placeholder="Write a note"></textarea>
-        <input type="file" id="journalPhoto"/>
-        <button onclick="logJournal()">Add to Journal</button>
-        <div id="journalLog"></div>
-      </div>
-
-      <!-- Health & Vaccinations -->
-      <div class="card">
-        <h3>Health & Vaccinations</h3>
-
-        <!-- Vaccination -->
-        <h4>Immunizations / Medication</h4>
-        <input type="text" id="vaccineName" placeholder="Name (e.g. Polio, Vitamin D)"/>
-        <input type="date" id="vaccineDate"/>
-        <textarea id="vaccineNotes" placeholder="Notes (e.g. dosage, reaction)"></textarea>
-        <button onclick="logVaccine()">Log Record</button>
-        <div id="vaccineLog"></div>
-
-        <!-- Reminders -->
-        <h4>Doctor Visit Reminders</h4>
-        <input type="date" id="reminderDate"/>
-        <textarea id="reminderNotes" placeholder="Reminder note (e.g. 6-month checkup)"></textarea>
-        <button onclick="addReminder()">Add Reminder</button>
-        <div id="reminderLog"></div>
+        <h3>😴 Sleep Guidance</h3>
+        <p>Babies typically sleep 14-17 hours per day at 4-12 months.</p>
       </div>
     </section>
   </div>
@@ -205,7 +151,7 @@
       document.getElementById(id).classList.add('active');
     }
 
-    // Auth system
+    // Signup
     function signup() {
       const name = signupName.value.trim();
       const email = signupEmail.value.trim();
@@ -218,6 +164,8 @@
         alert("Please fill all fields.");
       }
     }
+
+    // Login
     function login() {
       const email = loginEmail.value.trim();
       const pass = loginPassword.value.trim();
@@ -225,90 +173,33 @@
       if(user && user.email === email && user.pass === pass){
         localStorage.setItem("babyAppLoggedIn", "true");
         document.getElementById("userName").textContent = user.name;
-        document.getElementById("btn-logout").style.display = "block";
+        document.getElementById("mainNav").style.display = "flex";
         showSection('dashboard');
-        loadHealthData();
       } else {
         alert("Invalid credentials!");
       }
     }
+
+    // Logout
     function logout() {
       localStorage.setItem("babyAppLoggedIn", "false");
+      document.getElementById("mainNav").style.display = "none";
       showSection('login');
-      document.getElementById("btn-logout").style.display = "none";
     }
+
+    // First load
     window.onload = () => {
       const user = JSON.parse(localStorage.getItem("babyAppUser"));
       const loggedIn = localStorage.getItem("babyAppLoggedIn");
       if(user && loggedIn === "true"){
         document.getElementById("userName").textContent = user.name;
-        document.getElementById("btn-logout").style.display = "block";
+        document.getElementById("mainNav").style.display = "flex";
         showSection('dashboard');
-        loadHealthData();
       } else {
+        document.getElementById("mainNav").style.display = "none";
         showSection('login');
       }
     };
-
-    // Generic log helper
-    function makeLog(el, text, extraClass="") {
-      const div = document.createElement('div');
-      div.className = 'log-entry ' + extraClass;
-      div.textContent = text;
-      el.appendChild(div);
-    }
-
-    // Trackers
-    function logFeeding() {
-      makeLog(feedingLog, `🍼 ${feedingType.value} • ${feedingAmount.value} ml/g • ${feedingNotes.value}`);
-    }
-    function logSleep() { makeLog(sleepLog, `😴 From ${sleepStart.value} to ${sleepEnd.value}`); }
-    function logDiaper() { makeLog(diaperLog, `🧷 ${diaperType.value}`); }
-    function logGrowth() { makeLog(growthLog, `📈 W:${weight.value}kg, H:${height.value}cm, Head:${headSize.value}cm`); }
-    function logMilestone() { makeLog(milestoneLog, `🌟 ${milestone.value}`); }
-    function logJournal() {
-      let text = journalEntry.value;
-      if(journalPhoto.files[0]) text += ` (Photo: ${journalPhoto.files[0].name})`;
-      makeLog(journalLog, `📔 ${text}`);
-    }
-
-    // Health & Vaccinations
-    function logVaccine() {
-      const name = vaccineName.value, date = vaccineDate.value, notes = vaccineNotes.value;
-      const record = {name, date, notes};
-      let list = JSON.parse(localStorage.getItem("babyVaccines")) || [];
-      list.push(record);
-      localStorage.setItem("babyVaccines", JSON.stringify(list));
-      renderVaccines();
-    }
-    function addReminder() {
-      const date = reminderDate.value, notes = reminderNotes.value;
-      const record = {date, notes};
-      let list = JSON.parse(localStorage.getItem("babyReminders")) || [];
-      list.push(record);
-      localStorage.setItem("babyReminders", JSON.stringify(list));
-      renderReminders();
-    }
-    function renderVaccines() {
-      vaccineLog.innerHTML = "";
-      const list = JSON.parse(localStorage.getItem("babyVaccines")) || [];
-      list.forEach(v => {
-        makeLog(vaccineLog, `💉 ${v.name} on ${v.date} (${v.notes})`);
-      });
-    }
-    function renderReminders() {
-      reminderLog.innerHTML = "";
-      const today = new Date().toISOString().split("T")[0];
-      const list = JSON.parse(localStorage.getItem("babyReminders")) || [];
-      list.forEach(r => {
-        const isDue = r.date && r.date <= today;
-        makeLog(reminderLog, `📅 ${r.date} • ${r.notes}`, isDue ? "reminder-due" : "");
-      });
-    }
-    function loadHealthData() {
-      renderVaccines();
-      renderReminders();
-    }
   </script>
 </body>
 </html>
