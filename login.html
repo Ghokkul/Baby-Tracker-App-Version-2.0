@@ -6,32 +6,40 @@
   <title>Login - Baby Tracker</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f2f2f2;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #56ab2f, #a8e063);
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
     }
     .container {
       background: white;
-      padding: 20px;
-      border-radius: 10px;
-      width: 300px;
+      padding: 25px;
+      border-radius: 15px;
+      width: 320px;
       text-align: center;
-      box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
+      box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+    }
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
     }
     input, button {
       width: 100%;
-      padding: 8px;
+      padding: 10px;
       margin: 10px 0;
-      border-radius: 5px;
+      border-radius: 8px;
       border: 1px solid #ccc;
+      font-size: 14px;
     }
     button {
       background: #4CAF50;
       color: white;
+      font-weight: bold;
       border: none;
+      transition: 0.3s;
     }
     button:hover {
       background: #45a049;
@@ -40,17 +48,26 @@
       display: block;
       margin-top: 10px;
       text-decoration: none;
+      color: #4CAF50;
+      font-size: 14px;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    #message {
+      margin-top: 10px;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Login</h2>
+    <h2>Welcome Back</h2>
     <input type="text" id="username" placeholder="Enter Username" required>
     <input type="password" id="password" placeholder="Enter Password" required>
     <button onclick="login()">Login</button>
     <p>Don’t have an account? <a href="signup.html">Sign Up</a></p>
-    <p id="message" style="color:red;"></p>
+    <p id="message"></p>
   </div>
 
   <script>
@@ -60,6 +77,7 @@
       const message = document.getElementById("message");
 
       if(username === "" || password === "") {
+        message.style.color = "red";
         message.textContent = "Please fill all fields.";
         return;
       }
@@ -69,11 +87,12 @@
       if(storedPassword && storedPassword === password) {
         message.style.color = "green";
         message.textContent = "Login successful! Redirecting...";
-        localStorage.setItem("loggedInUser", username); // Save session
+        localStorage.setItem("loggedInUser", username);
         setTimeout(() => {
           window.location.href = "main.html"; 
         }, 1500);
       } else {
+        message.style.color = "red";
         message.textContent = "Invalid username or password.";
       }
     }
